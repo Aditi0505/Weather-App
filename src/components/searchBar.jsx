@@ -1,10 +1,15 @@
 import React from "react";
 import axios from "axios";
 import Display from "./Display";
-import { REACT_APP_API_URL, REACT_APP_API_KEY } from "../config.json";
+import {
+  REACT_APP_API_URL,
+  REACT_APP_API_KEY,
+  REACT_APP_ICON_URL,
+} from "../config.json";
 class SearchBar extends React.Component {
   state = {
     temp: "",
+    icon: null,
   };
   handleClick = async (city) => {
     const { data } = await axios.get(REACT_APP_API_URL, {
@@ -13,7 +18,12 @@ class SearchBar extends React.Component {
         appid: REACT_APP_API_KEY,
       },
     });
-    this.setState({ temp: data.main.temp });
+    const iconName = data["weather"][0].icon;
+    const iconURL = REACT_APP_ICON_URL + iconName + "@2x" + ".png";
+    console.log(iconURL);
+    const { data: icon } = await axios.get(iconURL);
+    console.log(icon.url);
+    this.setState({ temp: data.main.temp, icon: icon.url });
   };
   render() {
     return (
@@ -37,7 +47,7 @@ class SearchBar extends React.Component {
             </button>
           </form>
         </nav>
-        <Display value={this.state.temp} />
+        <Display value={this.state.temp} icon={this.state.icon} />
       </div>
     );
   }
